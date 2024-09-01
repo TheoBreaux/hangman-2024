@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import WelcomeScreen from './screens/WelcomeScreen';
-import Container from './components/Container';
+import GameScreen from './screens/GameScreen';
+import GetPlayerImage from './components/GetPlayerImage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,13 +25,17 @@ const App = () => {
   }
 
   return (
-    <Container>
+    <View style={styles.appContainer}>
       <StatusBar style="light" />
-      <WelcomeScreen />
-    </Container>
+      {/* <WelcomeScreen /> */}
+      <GetPlayerImage/>
+      {/* <GameScreen /> */}
+    </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  appContainer: { flex: 1 },
+});
 
 export default App;
