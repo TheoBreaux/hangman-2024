@@ -24,6 +24,9 @@ const App = () => {
     return null;
   }
 
+
+  
+
   return (
     <View style={styles.appContainer}>
       <StatusBar style="light" />

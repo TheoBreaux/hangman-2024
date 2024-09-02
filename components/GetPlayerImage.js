@@ -1,48 +1,52 @@
-import { StyleSheet, Text, View, Button, Pressable } from 'react-native';
+import { Alert, StyleSheet, Text, View, Image } from 'react-native';
 import { useState } from 'react';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import Button from './ui/Button';
+import * as ImagePicker from 'expo-image-picker';
 
 const GetPlayerImage = () => {
-  const [facing, setFacing] = useState('front');
-  const [permission, requestPermission] = useCameraPermissions();
+  const [playerImage, setPlayerImage] = useState(null);
 
-  if (!permission) {
-    return <View />;
-  }
+  const handleTakePicture = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
-  if (!permission.granted) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.message}>
-          We need your permission to show the camera
-        </Text>
-        <Button
-          onPress={requestPermission}
-          title="grant permission"
-        />
-      </View>
-    );
-  }
+    if (status !== 'granted') {
+      Alert.alert(
+        'Camera Permission',
+        'Permission to access the camera is required!',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+        ]
+      );
+      return;
+    }
 
-//   const toggleCameraFacing = () => {
-//     setFacing((current) => (current === 'back' ? 'front' : 'back'));
-//   };
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      cameraType: ImagePicker.CameraType.front,
+      quality: 1,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+    });
+
+    if (!result.canceled) {
+      setPlayerImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <View style={styles.container}>
-      <CameraView
-        style={styles.camera}
-        facing={facing}
-      >
-        <View style={styles.buttonContainer}>
-          <Pressable
-            style={styles.button}
-            onPress={""}
-          >
-            <Text style={styles.text}>Capture</Text>
-          </Pressable>
-        </View>
-      </CameraView>
+      {playerImage && (
+        <Image
+          source={{ uri: playerImage }}
+          style={styles.image}
+        />
+      )}
+      <View style={styles.frame}></View>
+      <Text style={styles.frameText}>Place your face here</Text>
+      <Button onPress={handleTakePicture}>Capture</Button>
     </View>
   );
 };
@@ -52,32 +56,23 @@ export default GetPlayerImage;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    margin: 20,
     justifyContent: 'center',
-  },
-  message: {
-    textAlign: 'center',
-    paddingBottom: 10,
-  },
-  camera: {
-    flex: 1,
-  },
-  buttonContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: 'transparent',
-    margin: 64,
-  },
-  button: {
-    flex: 1,
-    alignSelf: 'flex-end',
     alignItems: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    marginVertical: 20,
+  },
+  frame: {
+    width: 250,
+    height: 350,
     borderWidth: 2,
-    paddingVertical: 10,
-    borderRadius: 8,
+    borderColor: '#000',
+    borderRadius: 175, // Half of the height to create an oval shape
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
+  frameText: {},
 });
